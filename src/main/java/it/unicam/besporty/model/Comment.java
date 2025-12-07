@@ -2,39 +2,44 @@ package it.unicam.besporty.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
-public class Reaction {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String type;
+    private String text;
+    private LocalDateTime timestamp;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // FIX SERIALIZZAZIONE
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "checkin_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // FIX SERIALIZZAZIONE
     private CheckIn checkIn;
 
-    public Reaction() {}
+    public Comment() { this.timestamp = LocalDateTime.now(); }
 
-    public Reaction(String type, User user, CheckIn checkIn) {
-        this.type = type;
+    public Comment(String text, User user, CheckIn checkIn) {
+        this.text = text;
         this.user = user;
-        this.checkIn = checkIn; // <--- CORRETTO: Assegna l'oggetto passato, NON crearne uno nuovo!
+        this.checkIn = checkIn;
+        this.timestamp = LocalDateTime.now();
     }
 
+    // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
+    public String getText() { return text; }
+    public void setText(String text) { this.text = text; }
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
     public CheckIn getCheckIn() { return checkIn; }
     public void setCheckIn(CheckIn checkIn) { this.checkIn = checkIn; }
+    public LocalDateTime getTimestamp() { return timestamp; }
 }

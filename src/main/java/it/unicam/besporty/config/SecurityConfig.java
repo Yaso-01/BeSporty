@@ -28,43 +28,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Configurazione CORS "Permissiva"
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-                // 2. Disabilita CSRF (Blocca i POST se attivo)
                 .csrf(AbstractHttpConfigurer::disable)
-
-                // 3. Fix per H2 Console
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
-
-                // 4. Gestione degli URL
                 .authorizeHttpRequests(auth -> auth
-                        // Permetti sempre le chiamate "OPTIONS" (Pre-flight del browser)
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // Endpoint pubblici
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/api/users/**").permitAll()     // Login e Register
-                        .requestMatchers("/api/checkin/**").permitAll()   // Post e Feed
-
-                        // Per sicurezza in sviluppo, sblocca tutto sotto /api
+                        // PERMETTI TUTTO SOTTO /api PER EVITARE 403 SU LIKE/COMMENTI
                         .requestMatchers("/api/**").permitAll()
-
-                        // Tutto il resto richiede login
+                        .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()
                 );
-
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // USARE IL PATTERN "*" PERMETTE QUALSIASI ORIGINE (Localhost, 127.0.0.1, IP locale, ecc.)
         configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
-
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("*"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
 

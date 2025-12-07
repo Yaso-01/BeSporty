@@ -14,9 +14,7 @@ export default function AppRouter({ user, onLogout }) {
 
             <Routes>
                 <Route path="/" element={<Navigate to="/feed" />} />
-                <Route path="/feed" element={<FeedScreen />} />
-
-                {/* MODIFICA QUI: Aggiunto user={user} */}
+                <Route path="/feed" element={<FeedScreen user={user} />} />
                 <Route path="/profile" element={<ProfileScreen user={user} />} />
 
                 <Route path="/groups" element={<GroupsScreen />} />

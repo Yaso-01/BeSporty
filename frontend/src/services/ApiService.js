@@ -9,7 +9,6 @@ export const ApiService = {
      */
     register: async (userData) => {
         try {
-            // NOTA: L'endpoint giusto per la registrazione è /users/register
             const res = await axios.post(`${BASE_URL}/users/register`, userData, {
                 headers: { "Content-Type": "application/json" }
             });
@@ -20,24 +19,20 @@ export const ApiService = {
         }
     },
 
-    // !!! MODIFICA: HO AGGIUNTO QUESTA FUNZIONE 'login' MANCANTE !!!
     /**
      * Login utente
      */
-    login: async (email, password) => {
+    login: async (usernameOrEmail, password) => {
         try {
-            // Chiama l'endpoint di login del backend (UserController.java)
-            const res = await axios.post(`${BASE_URL}/users/login`, { email, password }, {
+            const res = await axios.post(`${BASE_URL}/users/login`, { usernameOrEmail, password }, {
                 headers: { "Content-Type": "application/json" }
             });
-            return res.data; // Ritorna i dati dell'utente
+            return res.data;
         } catch (err) {
             console.error("Errore login:", err);
-            // Lancia l'errore che il componente Login.jsx mostrerà
-            throw new Error(err.response?.data?.message || "Email o password errati");
+            throw new Error(err.response?.data?.message || "Credenziali errate");
         }
     },
-
 
     /**
      * Recupera il feed (tutti i check-in)
@@ -46,16 +41,12 @@ export const ApiService = {
         try {
             const res = await axios.get(`${BASE_URL}/checkin/feed`);
             const data = res.data;
-
-            // Garantiamo sempre che sia un array
             if (Array.isArray(data)) return data;
             if (data && Array.isArray(data.data)) return data.data;
             return [];
         } catch (err) {
             console.error("Errore caricamento feed:", err);
-            // Se il server restituisce un errore leggibile
-            const msg = err.response?.data?.error || "Errore caricamento feed";
-            throw new Error(msg);
+            throw new Error(err.response?.data?.error || "Errore caricamento feed");
         }
     },
 
@@ -81,23 +72,7 @@ export const ApiService = {
             return res.data;
         } catch (err) {
             console.error("Errore creazione post:", err);
-            const msg = err.response?.data?.error || "Errore creazione post";
-            throw new Error(msg);
-        }
-    },
-
-    /**
-     * Recupera i post di un singolo utente
-     */
-    getUserPosts: async (userId) => {
-        try {
-            const res = await axios.get(`${BASE_URL}/checkin/user/${userId}`);
-            const data = res.data;
-            return Array.isArray(data) ? data : [];
-        } catch (err) {
-            console.error("Errore caricamento post utente:", err);
-            const msg = err.response?.data?.error || "Errore caricamento post utente";
-            throw new Error(msg);
+            throw new Error(err.response?.data?.error || "Errore creazione post");
         }
     },
 
@@ -112,5 +87,46 @@ export const ApiService = {
             console.error("Errore caricamento profilo:", err);
             throw new Error(err.response?.data?.error || "Errore caricamento profilo utente");
         }
+    },
+
+    // --- GRUPPI ---
+    getAllGroups: async () => {
+        const res = await axios.get(`${BASE_URL}/groups`);
+        return res.data;
+    },
+
+    createGroup: async (groupData) => {
+        const res = await axios.post(`${BASE_URL}/groups`, groupData);
+        return res.data;
+    },
+
+    joinGroup: async (groupId, userId) => {
+        await axios.post(`${BASE_URL}/groups/${groupId}/addUser/${userId}`);
+    },
+
+    // --- INTERAZIONI (LIKE & COMMENTI) ---
+
+    // NUOVO: Controlla se l'utente ha già messo like
+    getLikeStatus: async (checkInId, userId) => {
+        const res = await axios.get(`${BASE_URL}/interactions/status/${checkInId}/${userId}`);
+        return res.data; // Ritorna { liked: true/false }
+    },
+
+    toggleLike: async (checkInId, userId) => {
+        // Ritorna { liked: true/false, newCount: number }
+        const res = await axios.post(`${BASE_URL}/interactions/like/${checkInId}/${userId}`);
+        return res.data;
+    },
+
+    addComment: async (checkInId, userId, text) => {
+        const res = await axios.post(`${BASE_URL}/interactions/comment`, {
+            checkInId, userId, text
+        });
+        return res.data;
+    },
+
+    getComments: async (checkInId) => {
+        const res = await axios.get(`${BASE_URL}/interactions/comments/${checkInId}`);
+        return res.data;
     }
 };

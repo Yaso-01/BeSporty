@@ -4,6 +4,8 @@ import it.unicam.besporty.model.CheckIn;
 import it.unicam.besporty.model.User;
 import it.unicam.besporty.repository.UserRepository;
 import it.unicam.besporty.repository.CheckInRepository;
+import it.unicam.besporty.repository.ReactionRepository; // Importante
+import it.unicam.besporty.repository.CommentRepository;  // Importante
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,19 +14,24 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/checkin")
+// @CrossOrigin rimossa, gestita da SecurityConfig
 public class CheckInController {
 
     private final CheckInRepository checkInRepository;
     private final UserRepository userRepository;
+    private final ReactionRepository reactionRepository;
+    private final CommentRepository commentRepository;
 
-    public CheckInController(CheckInRepository checkInRepository, UserRepository userRepository) {
+    public CheckInController(CheckInRepository checkInRepository,
+                             UserRepository userRepository,
+                             ReactionRepository reactionRepository,
+                             CommentRepository commentRepository) {
         this.checkInRepository = checkInRepository;
         this.userRepository = userRepository;
+        this.reactionRepository = reactionRepository;
+        this.commentRepository = commentRepository;
     }
 
-    /**
-     * Crea un nuovo check-in
-     */
     @PostMapping
     public ResponseEntity<?> create(@RequestBody Map<String, Object> payload) {
         try {
@@ -61,9 +68,6 @@ public class CheckInController {
         }
     }
 
-    /**
-     * Feed globale (tutti i check-in, più recenti per primi)
-     */
     @GetMapping("/feed")
     public ResponseEntity<?> feed() {
         List<CheckIn> list = checkInRepository.findAllByOrderByCreatedAtDesc();
@@ -84,8 +88,8 @@ public class CheckInController {
         return ResponseEntity.ok(out);
     }
 
-    // Helper: trasforma CheckIn in risposta “pulita”
-    private static Map<String, Object> toResponse(CheckIn c) {
+    // Helper: Ora aggiunge anche likeCount e commentCount
+    private Map<String, Object> toResponse(CheckIn c) {
         Map<String, Object> m = new HashMap<>();
         m.put("id", c.getId());
         m.put("userId", c.getUser().getId());
@@ -97,6 +101,15 @@ public class CheckInController {
         m.put("visibility", c.getVisibility());
         m.put("imageUrl", c.getImageUrl());
         m.put("createdAt", c.getCreatedAt());
+
+        // CONTEGGI REALI DAL DB
+        // Nota: Assicurati che ReactionRepository e CommentRepository abbiano questi metodi (li abbiamo aggiunti prima)
+        // Se `countByCheckIn_Id` da errore, usa `findByCheckIn_Id(c.getId()).size()` (meno efficiente ma ok per ora)
+        m.put("likeCount", reactionRepository.countByCheckIn_Id(c.getId()));
+
+        // Per i commenti non abbiamo aggiunto il count nel repo, usiamo la size della lista per semplicità
+        m.put("commentCount", commentRepository.findByCheckIn_IdOrderByTimestampAsc(c.getId()).size());
+
         return m;
     }
 }
