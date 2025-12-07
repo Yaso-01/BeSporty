@@ -1,31 +1,57 @@
-import React, { useState } from "react";
-import Login from "./components/Login";
-import Register from "./components/Register";
-import AppRouter from "./navigation/AppRouter";
+import React, { useState } from 'react';
+// 1. MODIFICA: Importiamo i componenti del Router
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import AppRouter from './navigation/AppRouter';
+import Login from './components/Login';
+import Register from './components/Register';
+import './App.css';
 
 function App() {
-    const [user, setUser] = useState(null);
-    const [showRegister, setShowRegister] = useState(false);
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
 
-    if (!user) {
-        return showRegister
-            ? <Register onRegisterSuccess={() => setShowRegister(false)} />
-            : (
-                <div>
-                    <Login onLoginSuccess={setUser} />
-                    <p style={{ color: "#fff", marginLeft: 8 }}>
-                        NON HAI UN ACCOUNT?{" "}
-                        <span
-                            style={{ color: "#2ed573", cursor: "pointer" }}
-                            onClick={() => setShowRegister(true)}
-                        >Registrati</span>
-                    </p>
+    // 2. MODIFICA: Rimuoviamo 'isRegistering', lo gestirà il Router
+
+    const handleLogin = (userData) => {
+        try {
+            localStorage.setItem('user', JSON.stringify(userData));
+            setUser(userData);
+        } catch (error) {
+            console.error("Impossibile salvare l'utente nel localStorage", error);
+        }
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        setUser(null);
+    };
+
+    // 3. MODIFICA: Avvolgiamo tutto in <BrowserRouter>
+    return (
+        <BrowserRouter>
+            {/* 4. MODIFICA: La logica di routing ora gestisce tutto */}
+            {!user ? (
+                // Se l'utente NON è loggato, mostriamo solo le rotte di Login e Register
+                <Routes>
+                    <Route
+                        path="/login"
+                        element={<Login onLogin={handleLogin} />}
+                    />
+                    <Route
+                        path="/register"
+                        // Passiamo onLogin così dopo la registrazione fa l'accesso automatico
+                        element={<Register onRegisterSuccess={handleLogin} />}
+                    />
+                    {/* Qualsiasi altra rotta (es. "/") reindirizza al login */}
+                    <Route path="*" element={<Navigate to="/login" />} />
+                </Routes>
+            ) : (
+                // Se l'utente È loggato, mostriamo l'app principale
+                <div className="App">
+                    <AppRouter user={user} onLogout={handleLogout} />
                 </div>
-            );
-    }
-
-    // Dopo il login, mostra la vera app (con navbar, routing, banner, tab, ecc.)
-    return <AppRouter user={user} setUser={setUser} />;
+            )}
+        </BrowserRouter>
+    );
 }
 
 export default App;

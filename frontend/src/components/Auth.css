@@ -1,0 +1,121 @@
+/* Auth.css */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Sfondo gradiente scuro coerente col tema */
+    background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+    font-family: 'Azonix', Arial, sans-serif;
+    padding: 20px;
+}
+
+.auth-box {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    padding: 20px;
+}
+
+.auth-icon-top {
+    font-size: 50px;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    padding: 15px;
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+.auth-title {
+    color: #fff;
+    font-size: 2rem;
+    margin-bottom: 40px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* Gruppo input con icona */
+.input-wrapper {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.input-icon {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #2ed573; /* Colore Neon Verde */
+    font-size: 1.2rem;
+}
+
+.auth-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #555; /* Riga grigia inattiva */
+    padding: 10px 10px 10px 35px; /* Spazio a sinistra per l'icona */
+    color: #fff;
+    font-size: 1rem;
+    font-family: 'Arial', sans-serif; /* Font più leggibile per input */
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.auth-input::placeholder {
+    color: #888;
+}
+
+.auth-input:focus {
+    border-bottom: 2px solid #2ed573; /* Diventa verde al focus */
+}
+
+/* Opzioni sotto i campi */
+.auth-options {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-bottom: 30px;
+    font-family: Arial, sans-serif;
+}
+
+.auth-options a {
+    color: #fda085; /* Colore Arancio */
+    text-decoration: none;
+}
+
+.auth-button {
+    width: 100%;
+    background: linear-gradient(90deg, #235c75 0%, #1a3d5c 100%); /* Blu simile alla foto */
+    /* OPPURE, se vuoi mantenere il tema BeSporty: */
+    /* background: linear-gradient(90deg, #2ed573 0%, #fda085 100%); */
+
+    color: #fff;
+    border: none;
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    transition: transform 0.2s;
+}
+
+.auth-button:hover {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+}
+
+.error-msg {
+    color: #ff4d4d;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}

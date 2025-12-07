@@ -9,7 +9,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/posts")
-@CrossOrigin
 public class PostController {
 
     @Autowired

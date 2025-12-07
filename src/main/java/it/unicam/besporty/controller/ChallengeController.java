@@ -9,7 +9,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/challenges")
-@CrossOrigin
 public class ChallengeController {
 
     @Autowired

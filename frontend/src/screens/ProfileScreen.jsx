@@ -5,12 +5,13 @@ export default function ProfileScreen({ user }) {
     // Se non arriva via props, prova da localStorage
     const storedUser = useMemo(() => {
         try {
-            const raw = localStorage.getItem("besporty:user");
+            const raw = localStorage.getItem("user");
             return raw ? JSON.parse(raw) : null;
         } catch {
             return null;
         }
     }, []);
+
     const effectiveUser = user || storedUser;
 
     const [profile, setProfile] = useState(effectiveUser);

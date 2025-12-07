@@ -1,77 +1,88 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState } from 'react';
+import { ApiService } from '../services/ApiService';
+import { useNavigate, Link } from 'react-router-dom';
+import { FaUser, FaLock } from 'react-icons/fa'; // Icone
+import './Auth.css'; // Importa il nuovo CSS
 
-const BASE_URL = "http://localhost:8080/api";
+const Login = ({ onLogin }) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-/**
- * Login “leggero”:
- * 1) prova a chiamare il BE: GET /api/users/by-username/{username}
- *    (se hai aggiunto l’endpoint come suggerito)
- * 2) fallback: se in localStorage è presente un utente con lo stesso username, usa quello
- */
-export default function Login({ onLoginSuccess }) {
-    const [form, setForm] = useState({ username: "", password: "" });
-    const [error, setError] = useState("");
-
-    const handleChange = (e) =>
-        setForm({ ...form, [e.target.name]: e.target.value });
-
-    const handleSubmit = async (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        setError("");
-
+        setError('');
         try {
-            // Tentativo A: endpoint BE (consigliato)
-            const res = await axios.get(
-                `${BASE_URL}/users/by-username/${encodeURIComponent(form.username)}`
-            );
-            const user = res.data; // atteso: { id, username, email, ... }
-            localStorage.setItem("besporty:user", JSON.stringify(user));
-            onLoginSuccess?.(user);
-            // es. redirect: window.location.href = "/checkin";
-            return;
-        } catch (_) {
-            // ignora, prova fallback
-        }
-
-        try {
-            // Tentativo B: fallback su localStorage (ultimo registrato)
-            const saved = localStorage.getItem("besporty:user");
-            if (saved) {
-                const user = JSON.parse(saved);
-                if (user?.username?.toLowerCase() === form.username.toLowerCase()) {
-                    onLoginSuccess?.(user);
-                    return;
-                }
-            }
-            throw new Error("Utente non trovato");
+            // Nota: ApiService.login si aspetta (email, password)
+            // Assicurati che il backend accetti "usernameOrEmail" se usi l'email
+            const response = await ApiService.login(email, password);
+            onLogin(response);
+            navigate('/feed');
         } catch (err) {
-            setError("Login fallito: utente non trovato.");
+            console.error(err);
+            setError('Credenziali non valide. Riprova.');
         }
     };
 
     return (
-        <div className="login-container">
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    name="username"
-                    placeholder="Username"
-                    value={form.username}
-                    onChange={handleChange}
-                    required
-                />
-                <input
-                    name="password"
-                    type="password"
-                    placeholder="Password"
-                    value={form.password}
-                    onChange={handleChange}
-                    required
-                />
-                {error && <div className="error" style={{color:"red"}}>{error}</div>}
-                <button type="submit" className="btn-accent">Login</button>
-            </form>
+        <div className="auth-container">
+            <div className="auth-box">
+                {/* Icona omino in alto */}
+                <div className="auth-icon-top">
+                    <FaUser />
+                </div>
+
+                <h2 className="auth-title">User Login</h2>
+
+                <form onSubmit={handleLogin}>
+                    {/* Campo Email */}
+                    <div className="input-wrapper">
+                        <FaUser className="input-icon" />
+                        <input
+                            type="text" // Uso text per permettere username o email
+                            className="auth-input"
+                            placeholder="Email o Username"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    {/* Campo Password */}
+                    <div className="input-wrapper">
+                        <FaLock className="input-icon" />
+                        <input
+                            type="password"
+                            className="auth-input"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    {error && <div className="error-msg">{error}</div>}
+
+                    <div className="auth-options">
+                        <label>
+                            <input type="checkbox" style={{ marginRight: 5 }} />
+                            Ricordami
+                        </label>
+                        <span>Password dimenticata?</span>
+                    </div>
+
+                    <button type="submit" className="auth-button" style={{background: "#3b5998"}}>
+                        LOGIN
+                    </button>
+
+                    <div style={{ marginTop: 20, fontSize: '0.9rem', color: '#888' }}>
+                        Non hai un account? <Link to="/register">Registrati</Link>
+                    </div>
+                </form>
+            </div>
         </div>
     );
-}
+};
+
+export default Login;

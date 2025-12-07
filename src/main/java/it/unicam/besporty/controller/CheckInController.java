@@ -12,7 +12,6 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/checkin")
-@CrossOrigin
 public class CheckInController {
 
     private final CheckInRepository checkInRepository;

@@ -4,60 +4,72 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
+import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // CORS per il frontend (React) su localhost 3000/3001
+                // 1. Configurazione CORS "Permissiva"
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // Disattiva CSRF per permettere test API e H2
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**").disable())
-                // Necessario per visualizzare H2 console in un iframe
+
+                // 2. Disabilita CSRF (Blocca i POST se attivo)
+                .csrf(AbstractHttpConfigurer::disable)
+
+                // 3. Fix per H2 Console
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
-                // Autorizzazioni
+
+                // 4. Gestione degli URL
                 .authorizeHttpRequests(auth -> auth
-                        // H2 console
+                        // Permetti sempre le chiamate "OPTIONS" (Pre-flight del browser)
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Endpoint pubblici
                         .requestMatchers("/h2-console/**").permitAll()
-                        // Auth (registrazione/login)
-                        .requestMatchers("/api/auth/**").permitAll()
-                        // Check-in (aperto in fase di test; poi potrai restringere)
-                        .requestMatchers("/api/checkin/**").permitAll()
-                        // Users lookup (login “light”, debug elenco)
-                        .requestMatchers("/api/users/by-username/**").permitAll()
-                        .requestMatchers("/api/users/by-email/**").permitAll()
-                        .requestMatchers("/api/users").permitAll()
-                        // Il resto: per ora aperto (puoi passare a authenticated() quando introduci JWT/sessioni)
-                        .anyRequest().permitAll()
-                )
-                // Basic abilita anche endpoint semplici (utile in debug)
-                .httpBasic(Customizer.withDefaults());
+                        .requestMatchers("/api/users/**").permitAll()     // Login e Register
+                        .requestMatchers("/api/checkin/**").permitAll()   // Post e Feed
+
+                        // Per sicurezza in sviluppo, sblocca tutto sotto /api
+                        .requestMatchers("/api/**").permitAll()
+
+                        // Tutto il resto richiede login
+                        .anyRequest().authenticated()
+                );
 
         return http.build();
     }
 
-    /**
-     * CORS: consenti chiamate dal FE in dev (http://localhost:3000/3001).
-     * Quando deployi in prod, sostituisci con il dominio reale del FE.
-     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:3001"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // USARE IL PATTERN "*" PERMETTE QUALSIASI ORIGINE (Localhost, 127.0.0.1, IP locale, ecc.)
+        configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
+
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 }

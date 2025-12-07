@@ -9,7 +9,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/badges")
-@CrossOrigin
 public class BadgeController {
 
     @Autowired

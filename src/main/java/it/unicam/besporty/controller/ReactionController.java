@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/reactions")
-@CrossOrigin
 public class ReactionController {
 
     @Autowired

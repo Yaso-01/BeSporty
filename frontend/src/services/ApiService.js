@@ -9,15 +9,35 @@ export const ApiService = {
      */
     register: async (userData) => {
         try {
-            const res = await axios.post(`${BASE_URL}/auth/register`, userData, {
+            // NOTA: L'endpoint giusto per la registrazione è /users/register
+            const res = await axios.post(`${BASE_URL}/users/register`, userData, {
                 headers: { "Content-Type": "application/json" }
             });
             return res.data;
         } catch (err) {
             console.error("Errore registrazione:", err);
-            throw new Error(err.response?.data?.error || "Errore durante la registrazione");
+            throw new Error(err.response?.data?.message || "Errore durante la registrazione");
         }
     },
+
+    // !!! MODIFICA: HO AGGIUNTO QUESTA FUNZIONE 'login' MANCANTE !!!
+    /**
+     * Login utente
+     */
+    login: async (email, password) => {
+        try {
+            // Chiama l'endpoint di login del backend (UserController.java)
+            const res = await axios.post(`${BASE_URL}/users/login`, { email, password }, {
+                headers: { "Content-Type": "application/json" }
+            });
+            return res.data; // Ritorna i dati dell'utente
+        } catch (err) {
+            console.error("Errore login:", err);
+            // Lancia l'errore che il componente Login.jsx mostrerà
+            throw new Error(err.response?.data?.message || "Email o password errati");
+        }
+    },
+
 
     /**
      * Recupera il feed (tutti i check-in)
