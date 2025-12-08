@@ -68,6 +68,13 @@ public class CheckInController {
         }
     }
 
+    //Controllers "Ibridi"
+    //per la risposta del feed non ritorna direttamente l'oggetto CheckIn,
+    // ma costruisce manualmente una Map<String, Object> (metodo toResponse).
+    //Questo serve per arricchire la risposta con dati calcolati che non esistono nel database,
+    // come likeCount e commentCount.
+    // È una soluzione veloce per evitare di creare classi DTO dedicate per il feed.
+
     @GetMapping("/feed")
     public ResponseEntity<?> feed() {
         List<CheckIn> list = checkInRepository.findAllByOrderByCreatedAtDesc();

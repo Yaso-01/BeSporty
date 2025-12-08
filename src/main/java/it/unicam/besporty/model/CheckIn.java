@@ -16,6 +16,10 @@ public class CheckIn {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    //Senza questa riga (18), Jackson (la libreria che trasforma gli oggetti Java in JSON)
+    // andrebbe in crash provando a serializzare un oggetto "proxy" di Hibernate non ancora inizializzato.
+    // Questo è fondamentale perché le relazioni (es. User dentro CheckIn) sono caricate in modo "Lazy"
+    // (solo quando servono).
     private User user;
 
     @Column(nullable = false, length = 500)
@@ -41,6 +45,9 @@ public class CheckIn {
 
     public CheckIn() {}
 
+    //Le entità usano i metodi @PrePersist e @PreUpdate.
+    // Questo fa sì che createdAt venga impostato automaticamente dal sistema
+    // nell'istante esatto del salvataggio, senza che il frontend debba inviarlo.
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

@@ -1,4 +1,8 @@
 import axios from "axios";
+//Tutte le chiamate passano per ApiService.js.
+// Questo è un ottimo pattern (Facade).
+// Se domani cambi l'URL del backend da localhost a un server cloud,
+// devi modificare solo una riga (BASE_URL).
 
 // Cambia questa variabile se il backend ha porta diversa
 const BASE_URL = "http://localhost:8080/api";

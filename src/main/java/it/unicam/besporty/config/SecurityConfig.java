@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         // PERMETTI TUTTO SOTTO /api PER EVITARE 403 SU LIKE/COMMENTI
+                        //significa che Spring Security non blocca le chiamate API se non c'è un token.
                         .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()

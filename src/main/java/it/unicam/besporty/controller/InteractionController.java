@@ -32,8 +32,13 @@ public class InteractionController {
             reactionRepository.delete(existing.get());
             liked = false;
         } else {
-            // FIX: Usiamo getReferenceById per ottenere proxy gestiti sicuri
+            // FIX: Usiamo getReferenceById per ottenere proxy gestiti sicuri invece del classico findById
+            //getReferenceById non fa una query al DB per recuperare tutto l'utente.
+            // Crea solo un riferimento (proxy) con l'ID.
+            // Poiché per salvare un Like (tabella Reaction) serve solo l'ID dell'utente (Foreign Key),
+            // questo risparmia una query di lettura inutile rendendo l'operazione di Like molto più veloce.
             User user = userRepository.getReferenceById(userId);
+
             CheckIn checkIn = checkInRepository.getReferenceById(checkInId);
 
             Reaction reaction = new Reaction("LIKE", user, checkIn);
