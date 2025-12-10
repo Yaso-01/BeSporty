@@ -9,6 +9,10 @@ import jakarta.persistence.*;
         @UniqueConstraint(columnNames = "email")
 })
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // <--- FONDAMENTALE
+//Senza questa riga, Jackson (la libreria che trasforma gli oggetti Java in JSON)
+// andrebbe in crash provando a serializzare un oggetto "proxy" di Hibernate non ancora inizializzato.
+// Questo è fondamentale perché le relazioni (es. User dentro CheckIn)
+// sono caricate in modo "Lazy" (solo quando servono).
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

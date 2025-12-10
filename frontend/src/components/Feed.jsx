@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { ApiService } from "../services/ApiService";
+import { FaHeart, FaRegHeart, FaComment, FaPaperPlane } from "react-icons/fa"; // Icone più belle
 
 function FeedItem({ post }) {
     // RECUPERO UTENTE DIRETTO (Più robusto)
@@ -94,67 +95,93 @@ function FeedItem({ post }) {
     };
 
     return (
-        <li style={{
-            background: "#222", padding: "18px", borderRadius: "12px", marginBottom: "16px",
-            boxShadow: "0 2px 8px #00000055", color: "#fff", border: "1px solid #333"
-        }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                <h3 style={{ margin: 0, color: "#fda085" }}>{post.username || "Anonimo"}</h3>
-                <span style={{ fontSize: "0.8rem", color: "#666" }}>
-                    {new Date(post.createdAt).toLocaleDateString()}
-                </span>
+        <li className="feed-card">
+            {/* Header del Post */}
+            <div className="card-header">
+                <div className="user-info">
+                    <div className="avatar-placeholder">
+                        {post.username ? post.username.charAt(0).toUpperCase() : "U"}
+                    </div>
+                    <div>
+                        <h3 className="username">{post.username || "Anonimo"}</h3>
+                        <span className="timestamp">
+                            {new Date(post.createdAt).toLocaleDateString()} alle {new Date(post.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </span>
+                    </div>
+                </div>
             </div>
 
-            <p style={{ margin: "8px 0", fontSize: "1.1rem" }}>{post.text}</p>
+            {/* Contenuto Testuale */}
+            <div className="card-body">
+                <p className="post-text">{post.text}</p>
 
-            <div style={{ fontSize: "0.9em", color: "#aaa", marginBottom: "15px" }}>
-                <span style={{ color: "#2ed573", fontWeight: "bold", textTransform: "uppercase" }}>🏅 {post.sport}</span>
-                {post.intensity && <span style={{ marginLeft: 15 }}>⚡ Intensità: {post.intensity}</span>}
+                <div className="post-meta">
+                    <span className="badge-sport">🏅 {post.sport}</span>
+                    {post.intensity && (
+                        <span className="badge-intensity">⚡ Intensità: {post.intensity}/10</span>
+                    )}
+                </div>
             </div>
 
+            {/* Immagine (se presente) */}
             {post.imageUrl && (
-                <img src={post.imageUrl} alt="post" style={{ maxWidth: "100%", borderRadius: "8px", marginBottom: "15px" }} />
+                <div className="card-image-container">
+                    <img src={post.imageUrl} alt="post" className="card-image" />
+                </div>
             )}
 
             {/* BARRA AZIONI */}
-            <div style={{ display: "flex", gap: "25px", borderTop: "1px solid #444", paddingTop: "12px" }}>
+            <div className="action-bar">
                 <button
                     onClick={handleLike}
-                    style={{ background: "none", border: "none", color: isLiked ? "#ff4757" : "#bbb", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: "1rem", fontFamily: "inherit", transition: "color 0.2s" }}>
-                    {isLiked ? "❤️" : "🤍"} {likes} Like
+                    className={`action-btn ${isLiked ? "liked" : ""}`}
+                >
+                    {isLiked ? <FaHeart /> : <FaRegHeart />}
+                    <span>{likes} Like</span>
                 </button>
+
                 <button
                     onClick={toggleComments}
-                    style={{ background: "none", border: "none", color: "#bbb", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: "1rem", fontFamily: "inherit" }}>
-                    💬 {commentCountDisplay} Commenti
+                    className="action-btn"
+                >
+                    <FaComment />
+                    <span>{commentCountDisplay} Commenti</span>
                 </button>
             </div>
 
             {/* AREA COMMENTI */}
             {showComments && (
-                <div style={{ marginTop: "15px", background: "#1a1a1a", padding: "15px", borderRadius: "10px" }}>
-                    {comments.length === 0 && <div style={{color: "#777", fontSize: "0.9rem", textAlign: "center"}}>Nessun commento. Scrivi il primo!</div>}
+                <div className="comments-section">
+                    {comments.length === 0 && (
+                        <div className="no-comments">Nessun commento. Scrivi il primo!</div>
+                    )}
 
-                    <div style={{ maxHeight: "300px", overflowY: "auto", marginBottom: "15px" }}>
+                    <div className="comments-list">
                         {comments.map(c => (
-                            <div key={c.id} style={{ marginBottom: "10px", borderBottom: "1px solid #333", paddingBottom: "8px" }}>
-                                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                    <strong style={{ color: "#2ed573", fontSize: "0.85rem" }}>{c.user ? c.user.username : "Utente"}</strong>
-                                    <span style={{ fontSize: "0.7rem", color: "#555" }}>{new Date(c.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            <div key={c.id} className="comment-item">
+                                <div className="comment-header">
+                                    <strong className="comment-author">
+                                        {c.user ? c.user.username : "Utente"}
+                                    </strong>
+                                    <span className="comment-time">
+                                        {new Date(c.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                    </span>
                                 </div>
-                                <div style={{ fontSize: "0.95rem", color: "#ddd", marginTop: "2px" }}>{c.text}</div>
+                                <div className="comment-text">{c.text}</div>
                             </div>
                         ))}
                     </div>
 
-                    <div style={{ display: "flex", gap: "10px" }}>
+                    <div className="comment-input-wrapper">
                         <input
                             value={newComment}
                             onChange={e => setNewComment(e.target.value)}
                             placeholder="Scrivi un commento..."
-                            style={{ flex: 1, padding: "10px", borderRadius: "8px", border: "1px solid #444", background: "#2a2a2a", color: "#fff", outline: "none" }}
+                            className="comment-input"
                         />
-                        <button onClick={handleSendComment} style={{ background: "#2ed573", border: "none", borderRadius: "8px", cursor: "pointer", padding: "0 18px", color: "#000", fontWeight: "bold" }}>➤</button>
+                        <button onClick={handleSendComment} className="send-btn">
+                            <FaPaperPlane />
+                        </button>
                     </div>
                 </div>
             )}
@@ -184,14 +211,14 @@ export default function Feed() {
         loadFeed();
     }, []);
 
-    if (loading) return <div style={{ color: "#fff", padding: 20, textAlign: "center" }}>Caricamento feed...</div>;
-    if (error) return <div style={{ color: "#ff6b6b", padding: 20, textAlign: "center" }}>{error}</div>;
-    if (!posts.length) return <div style={{ marginTop: 20, color: "#ccc", textAlign: "center" }}>Nessun check-in trovato.</div>;
+    if (loading) return <div className="feed-loading">Caricamento feed...</div>;
+    if (error) return <div className="feed-error">{error}</div>;
+    if (!posts.length) return <div className="feed-empty">Nessun check-in trovato.</div>;
 
     return (
-        <div style={{ marginTop: "20px" }}>
-            <h2 style={{ color: "#2ed573", marginBottom: 18, fontFamily: "Azonix", textAlign: "center" }}>FEED</h2>
-            <ul style={{ listStyle: "none", padding: 0 }}>
+        <div className="feed-container">
+            <h2 className="feed-title">FEED ATTIVITÀ</h2>
+            <ul className="feed-list">
                 {posts.map(post => (
                     <FeedItem key={post.id} post={post} />
                 ))}

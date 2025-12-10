@@ -1,55 +1,54 @@
-import React from "react";
-// 1. Importa useNavigate e la nuova icona
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FaHome, FaUserAlt, FaUsers, FaTrophy, FaPlusCircle, FaSignOutAlt } from "react-icons/fa";
-import "./Navbar.css"; // Stile personalizzato
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { FaBars, FaTimes } from "react-icons/fa"; // Assicurati di avere react-icons installato
+import "./Navbar.css";
 
-// 2. Accetta la prop "onLogout"
 export default function Navbar({ onLogout }) {
     const location = useLocation();
-    // 3. Inizializza navigate
-    const navigate = useNavigate();
+    const [isOpen, setIsOpen] = useState(false); // Stato per gestire apertura/chiusura
 
-    const navItems = [
-        { to: "/feed", icon: <FaHome />, label: "Feed" },
-        { to: "/checkin", icon: <FaPlusCircle />, label: "Check-In" },
-        { to: "/groups", icon: <FaUsers />, label: "Gruppi" },
-        { to: "/badges", icon: <FaTrophy />, label: "Badge" },
-        { to: "/profile", icon: <FaUserAlt />, label: "Profilo" },
-    ];
+    // Helper per classe attiva
+    const getLinkClass = (path) =>
+        location.pathname === path ? "nav-link active" : "nav-link";
 
-    // 4. Crea la funzione per gestire il click sul logout
-    const handleLogoutClick = () => {
-        onLogout(); // Pulisce lo stato in App.js e il localStorage
-        navigate('/login', { replace: true }); // Torna al login
-    };
+    // Funzione per chiudere il menu quando si clicca un link
+    const closeMenu = () => setIsOpen(false);
 
     return (
         <nav className="navbar">
-            <div className="navbar-logo">
-                <span role="img" aria-label="logo" className="logo-emoji">🏆</span>
-                <span className="navbar-title">BeSporty</span>
-            </div>
-            <div className="navbar-tabs">
-                {navItems.map(item => (
-                    <Link
-                        key={item.to}
-                        to={item.to}
-                        className={location.pathname === item.to ? "nav-link active" : "nav-link"}
-                    >
-                        {item.icon}
-                        <span>{item.label}</span>
-                    </Link>
-                ))}
+            <div className="navbar-container">
+                <Link to="/feed" className="navbar-brand" onClick={closeMenu}>
+                    BESPORTY
+                </Link>
 
-                {/* 5. Aggiungi il pulsante di Logout */}
-                <button
-                    onClick={handleLogoutClick}
-                    className="nav-link logout-button" // Usiamo le classi giuste
-                >
-                    <FaSignOutAlt />
-                    <span>Abbandona</span>
-                </button>
+                {/* Icona Hamburger (visibile solo su mobile) */}
+                <div className="menu-icon" onClick={() => setIsOpen(!isOpen)}>
+                    {isOpen ? <FaTimes /> : <FaBars />}
+                </div>
+
+                {/* Lista Link (Aggiungiamo classe 'active' se aperto) */}
+                <div className={`navbar-links ${isOpen ? "active" : ""}`}>
+                    <Link to="/feed" className={getLinkClass("/feed")} onClick={closeMenu}>
+                        Feed
+                    </Link>
+                    <Link to="/checkin" className={getLinkClass("/checkin")} onClick={closeMenu}>
+                        Check-In
+                    </Link>
+                    <Link to="/groups" className={getLinkClass("/groups")} onClick={closeMenu}>
+                        Gruppi
+                    </Link>
+                    <Link to="/profile" className={getLinkClass("/profile")} onClick={closeMenu}>
+                        Profilo
+                    </Link>
+
+                    {/* Bottone Logout */}
+                    <button
+                        onClick={() => { onLogout(); closeMenu(); }}
+                        className="btn-logout"
+                    >
+                        Logout
+                    </button>
+                </div>
             </div>
         </nav>
     );

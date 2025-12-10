@@ -1,38 +1,694 @@
-.App {
-  text-align: center;
+/* App.css - IL NUOVO STILE */
+
+/* Import font moderni da Google Fonts (se non li hai scaricati localmente) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+:root {
+    /* --- PALETTE COLORI "DARK SPORT" --- */
+    --bg-main: #121212;       /* Sfondo principale (quasi nero) */
+    --bg-card: #1e1e1e;       /* Sfondo delle card */
+    --bg-input: #2C2C2C;      /* Sfondo input più chiaro */
+    --bg-hover: #333333;      /* Hover generico */
+
+    --primary: #2ed573;       /* Verde Sporty (Brand Color) */
+    --primary-hover: #26af61; /* Verde scuro per hover */
+    --secondary: #ff4757;     /* Rosso (Like / Errori) */
+    --accent: #ffa502;        /* Arancione (Warning / Highlight) */
+    --text-main: #ffffff;     /* Bianco puro */
+    --text-muted: #a4b0be;    /* Grigio chiaro per testi secondari */
+
+    /* --- SPAZI E FORME --- */
+    --radius: 12px;           /* Arrotondamento standard */
+    --radius-sm: 8px;         /* Arrotondamento piccolo */
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.5); /* Ombra profonda */
+    --nav-height: 70px;       /* Altezza fissa navbar */
+    --transition: all 0.2s ease-in-out;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding-top: calc(var(--nav-height) + 20px); /* Spazio per non finire sotto la navbar */
+    -webkit-font-smoothing: antialiased;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* --- COMPONENTI UI STANDARD --- */
+
+/* Bottoni */
+button {
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    font-weight: 600;
+    transition: var(--transition);
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.btn-primary {
+    background-color: var(--primary);
+    color: #121212; /* Testo scuro su sfondo neon per contrasto */
+    padding: 12px 24px;
+    border-radius: var(--radius);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 800;
 }
 
-.App-link {
-  color: #61dafb;
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 213, 115, 0.3);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.btn-icon {
+    background: transparent;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+}
+
+.btn-icon:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+}
+
+.btn-icon.active {
+    color: var(--secondary); /* Es. Cuore rosso */
+}
+
+/* Input e Form */
+input, textarea, select {
+    width: 100%;
+    background-color: var(--bg-input);
+    border: 1px solid transparent;
+    color: var(--text-main);
+    padding: 14px;
+    border-radius: var(--radius);
+    outline: none;
+    font-size: 1rem;
+    transition: var(--transition);
+    box-sizing: border-box;
+    margin-bottom: 12px;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: var(--primary);
+    background-color: #333;
+}
+
+/* Scrollbar stilizzata */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-main); }
+::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+
+/* CSS per NewPost (Aggiungi in App.css) */
+.newpost-card {
+    background-color: var(--bg-card);
+    padding: 24px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255,255,255,0.05);
+
+    /* ALLINEAMENTO COL FEED */
+    width: 95%;
+    max-width: 1000px;   /* Stessa larghezza del feed */
+    margin: 0 auto 30px auto; /* Centrato + 30px di spazio sotto */
+    box-sizing: border-box; /* Assicura che il padding non rompa la larghezza */
+}
+
+.newpost-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--primary);
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px; /* Spazio tra input affiancati */
+}
+
+/* Stile specifico per renderlo più compatto */
+.form-row input {
+    flex: 1; /* Dividono lo spazio equamente */
+}
+
+/* Quando siamo su cellulare, mandali a capo */
+@media (max-width: 600px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+}
+
+
+/* --- NEW POST: SELETTORE SPORT --- */
+
+.section-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sports-grid {
+    display: grid;
+    /* Crea colonne automatiche larghe minimo 75px */
+    grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.sport-card {
+    background-color: var(--bg-input);
+    border: 2px solid transparent;
+    border-radius: var(--radius);
+    padding: 10px 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.sport-card:hover {
+    background-color: var(--bg-hover);
+}
+
+/* Stato SELEZIONATO */
+.sport-card.selected {
+    border-color: var(--primary);
+    background-color: rgba(46, 213, 115, 0.15); /* Verde molto trasparente */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 213, 115, 0.2);
+}
+
+.sport-card.selected .sport-icon {
+    color: var(--primary);
+}
+
+.sport-icon {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    transition: color 0.2s;
+}
+
+.sport-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+/* --- DROPDOWN INTENSITÀ --- */
+.input-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    display: block;
+}
+
+.styled-select {
+    appearance: none; /* Rimuove lo stile di default del browser */
+    background-color: var(--bg-input);
+    color: var(--text-main);
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2F www.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%232ed573%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px top 50%;
+    background-size: 10px auto;
+    padding-right: 30px; /* Spazio per la freccina */
+}
+
+/* Messaggi di feedback */
+.msg-error { color: var(--secondary); font-size: 0.9rem; margin-top: 10px; }
+.msg-success { color: var(--primary); font-size: 0.9rem; margin-top: 10px; }
+
+
+
+/* --- FEED & POST CARD STYLES --- */
+
+.feed-container {
+    width: 95%;          /* Occupa quasi tutto lo spazio disponibile */
+    max-width: 1000px;   /* ...ma si ferma a 1000px su schermi giganti per non sgranare */
+    margin: 0 auto;      /* Centra orizzontalmente */
+    padding-bottom: 80px;
+}
+
+.feed-title {
+    color: var(--primary);
+    text-align: center;
+    font-family: 'Azonix', sans-serif; /* O il font che preferisci */
+    margin-bottom: 25px;
+    letter-spacing: 2px;
+}
+
+.feed-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.feed-card {
+    background-color: var(--bg-card);
+    border-radius: var(--radius);
+    margin-bottom: 25px;
+    overflow: hidden; /* Per l'immagine */
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: transform 0.2s;
+}
+
+/* Header: Avatar e Info */
+.card-header {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary), #218c74);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.username {
+    font-size: 1rem;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.timestamp {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: block;
+}
+
+/* Corpo del post */
+.card-body {
+    padding: 0 15px 15px;
+}
+
+.post-text {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #eee;
+    margin-bottom: 12px;
+}
+
+.post-meta {
+    display: flex;
+    gap: 10px;
+    font-size: 0.85rem;
+}
+
+.badge-sport {
+    color: var(--primary);
+    background: rgba(46, 213, 115, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-intensity {
+    color: #ffa502; /* Arancione */
+    background: rgba(255, 165, 2, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* Immagine */
+.card-image-container {
+    width: 100%;
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #333;
+}
+
+/* --- MIGLIORIA IMMAGINI PER SCHERMI GRANDI --- */
+/* Se il post è molto largo, evitiamo che l'immagine diventi altissima */
+.card-image {
+    width: 100%;
+    display: block;
+    max-height: 600px; /* Aumentato un po' per schermi grandi */
+    object-fit: cover; /* Taglia l'eccedenza senza deformare */
+    object-position: center;
+}
+
+/* Barra Azioni */
+.action-bar {
+    padding: 10px 15px;
+    display: flex;
+    gap: 20px;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px;
+    transition: color 0.2s;
+}
+
+.action-btn:hover {
+    color: var(--text-main);
+}
+
+.action-btn.liked {
+    color: var(--secondary); /* Rosso Cuore */
+}
+
+/* Sezione Commenti */
+.comments-section {
+    background-color: #161616; /* Leggermente più scuro della card */
+    padding: 15px;
+    border-top: 1px solid #333;
+}
+
+.no-comments {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.comments-list {
+    max-height: 250px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.comment-item {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #2a2a2a;
+    padding-bottom: 8px;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+}
+
+.comment-author {
+    color: var(--primary);
+}
+
+.comment-time {
+    color: #555;
+}
+
+.comment-text {
+    font-size: 0.9rem;
+    color: #ddd;
+}
+
+/* Input Commenti */
+.comment-input-wrapper {
+    display: flex;
+    gap: 10px;
+}
+
+.comment-input {
+    flex: 1;
+    background: #2a2a2a;
+    border: none;
+    padding: 10px;
+    border-radius: 20px;
+    color: #fff;
+    font-size: 0.9rem;
+    margin-bottom: 0; /* Override */
+}
+
+.send-btn {
+    background: var(--primary);
+    color: #000;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+
+
+
+
+/* --- PAGE CONTAINER GENERALE --- */
+.page-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    padding-bottom: 100px;
+}
+
+.page-title {
+    color: var(--primary);
+    text-align: center;
+    font-family: 'Azonix', sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(46, 213, 115, 0.3);
+}
+
+/* --- GROUPS SCREEN --- */
+.groups-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); /* Responsive */
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.group-card {
+    background-color: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 25px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, border-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 220px;
+}
+
+.group-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+}
+
+.group-icon-wrapper {
+    font-size: 3rem;
+    color: var(--accent); /* Arancione */
+    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.group-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-main);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.group-members {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+/* Card Speciale "Crea Nuovo" */
+.create-card {
+    border: 2px dashed var(--primary);
+    background: rgba(46, 213, 115, 0.05);
+    cursor: pointer;
+    justify-content: center;
+    gap: 15px;
+}
+
+.create-card:hover {
+    background: rgba(46, 213, 115, 0.1);
+}
+
+/* MODALE (Overlay scuro) */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background-color: var(--bg-card);
+    padding: 30px;
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid var(--primary);
+    box-shadow: 0 0 30px rgba(46, 213, 115, 0.2);
+}
+
+/* --- PROFILE SCREEN --- */
+.profile-card {
+    background-color: var(--bg-card);
+    max-width: 500px;
+    margin: 0 auto; /* Centrato */
+    padding: 40px;
+    border-radius: 24px; /* Più arrotondato */
+    box-shadow: var(--shadow);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Linea decorativa in alto */
+.profile-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+
+.profile-avatar-large {
+    width: 130px;
+    height: 130px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #333, #111);
+    border: 3px solid var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    color: var(--text-main);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.profile-username {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+    color: var(--text-main);
+}
+
+.profile-email {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.stat-box {
+    background: var(--bg-input);
+    padding: 15px;
+    border-radius: var(--radius);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--primary);
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 1.1rem;
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.badges-section h4 {
+    color: var(--accent);
+    margin-bottom: 15px;
+    font-family: 'Azonix', sans-serif;
+}
+
+
+/* App.css */
+
+.badge-circle {
+    /* DIMENSIONI FISSE: Assicurano la forma quadrata di base */
+    width: 50px;
+    height: 50px;
+
+    /* CERCHIO PERFETTO */
+    border-radius: 50%;
+
+    /* CENTRATURA DEL CONTENUTO (Icona) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* PROTEZIONE CONTRO LO SCHIACCIAMENTO */
+    flex-shrink: 0; /* <--- FONDAMENTALE */
+
+    /* Stile visivo */
+    font-size: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
+}
+
+.badge-circle:hover {
+    transform: scale(1.1) rotate(10deg); /* Piccolo effetto wow al passaggio del mouse */
 }

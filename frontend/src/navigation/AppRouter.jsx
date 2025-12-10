@@ -6,7 +6,9 @@ import ProfileScreen from "../screens/ProfileScreen";
 import GroupsScreen from "../screens/GroupsScreen";
 import BadgeScreen from "../screens/BadgeScreen";
 import CheckInScreen from "../screens/CheckInScreen";
-
+// riceve l'oggetto user e lo passa a cascata (FeedScreen, ProfileScreen, ecc.).
+// Questo evita l'uso complesso di Redux, mantenendo l'app leggera:
+// se l'utente fa logout, lo stato si pulisce in alto e l'interfaccia si resetta.
 export default function AppRouter({ user, onLogout }) {
     return (
         <>

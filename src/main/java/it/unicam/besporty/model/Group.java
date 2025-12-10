@@ -13,7 +13,10 @@ public class Group {
     private String name;
     private String description;
     private boolean isPrivate;
-    private String checkInSlot; // es: "18-20"
+    private String checkInSlot;
+
+    // NUOVO CAMPO
+    private String sport;
 
     @ManyToMany
     @JoinTable(
@@ -28,13 +31,15 @@ public class Group {
 
     public Group() {}
 
-    public Group(String name, String description, boolean isPrivate, String checkInSlot) {
+    public Group(String name, String description, boolean isPrivate, String checkInSlot, String sport) {
         this.name = name;
         this.description = description;
         this.isPrivate = isPrivate;
         this.checkInSlot = checkInSlot;
+        this.sport = sport;
     }
 
+    // Getter e Setter
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -49,6 +54,9 @@ public class Group {
 
     public String getCheckInSlot() { return checkInSlot; }
     public void setCheckInSlot(String checkInSlot) { this.checkInSlot = checkInSlot; }
+
+    public String getSport() { return sport; }
+    public void setSport(String sport) { this.sport = sport; }
 
     public Set<User> getMembers() { return members; }
     public void setMembers(Set<User> members) { this.members = members; }

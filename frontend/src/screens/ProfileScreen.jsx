@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { ApiService } from "../services/ApiService";
+import { FaMedal, FaFire, FaUserAstronaut } from "react-icons/fa"; // Ho aggiunto un'icona carina per il placeholder
 
 export default function ProfileScreen({ user }) {
     // 1. Recupero utente da props o localStorage
     const storedUser = useMemo(() => {
         try {
-            const raw = localStorage.getItem("user"); // Chiave corretta "user"
+            const raw = localStorage.getItem("user");
             return raw ? JSON.parse(raw) : null;
         } catch {
             return null;
@@ -16,7 +17,7 @@ export default function ProfileScreen({ user }) {
     const [profile, setProfile] = useState(effectiveUser);
     const [error, setError] = useState("");
 
-    // 2. Caricamento dati aggiornati dal Backend (inclusi Età e Sport)
+    // 2. Caricamento dati aggiornati dal Backend
     useEffect(() => {
         const load = async () => {
             if (!effectiveUser?.id) return;
@@ -32,99 +33,95 @@ export default function ProfileScreen({ user }) {
         load();
     }, [effectiveUser]);
 
+    // Se l'utente non è loggato
     if (!effectiveUser) {
         return (
-            <div style={{ padding: "24px", color: "#fff", textAlign: "center" }}>
-                <h2>EFFETTUA L'ACCESSO PER VEDERE IL PROFILO.</h2>
+            <div className="page-container" style={{ textAlign: "center", marginTop: "50px" }}>
+                <h2 style={{color: "var(--secondary)", fontFamily: "Azonix, sans-serif"}}>ACCESSO RICHIESTO</h2>
+                <p style={{color: "var(--text-muted)"}}>Effettua il login per visualizzare il tuo profilo.</p>
             </div>
         );
     }
 
     return (
-        <div style={{ padding: "24px", background: "#000", minHeight: "100vh" }}>
-            <div
-                style={{
-                    background: "#111", // Sfondo leggermente più chiaro del nero totale
-                    color: "#fff",
-                    padding: "32px 24px",
-                    borderRadius: "22px",
-                    margin: "0 auto",
-                    maxWidth: "500px",
-                    boxShadow: "0 0 20px #2ed57333", // Bagliore verde
-                    textAlign: "center",
-                    fontFamily: "Azonix, sans-serif"
-                }}
-            >
-                <h2
-                    style={{
-                        color: "#2ed573",
-                        marginBottom: 20,
-                        letterSpacing: 2,
-                    }}
-                >
-                    PROFILO PERSONALE
-                </h2>
+        <div className="page-container">
+            <h2 className="page-title">IL TUO PROFILO</h2>
 
-                {/* Avatar */}
-                <div
-                    style={{
-                        width: 120,
-                        height: 120,
-                        borderRadius: "50%",
-                        margin: "0 auto 20px auto",
-                        background: "linear-gradient(135deg, #2ed573 0%, #000 100%)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: 48,
-                        boxShadow: "0 0 15px #2ed573"
-                    }}
-                >
-                    <span role="img" aria-label="avatar">🏋️‍♂️</span>
+            <div className="profile-card">
+                {/* Avatar Iconico */}
+                <div className="profile-avatar-large">
+                    {profile?.username ? (
+                        profile.username.charAt(0).toUpperCase()
+                    ) : (
+                        <FaUserAstronaut />
+                    )}
                 </div>
 
-                {error && <div style={{ color: "red", marginBottom: 10 }}>{error}</div>}
+                {error && <div style={{ color: "var(--secondary)", marginBottom: 10 }}>{error}</div>}
 
-                <h3 style={{ marginBottom: 5 }}>@{profile?.username || "username"}</h3>
+                <h3 className="profile-username">@{profile?.username}</h3>
+                <div className="profile-email">{profile?.email}</div>
 
-                <div style={{ color: "#aaa", fontSize: "0.9rem", marginBottom: 20 }}>
-                    {profile?.email}
-                </div>
-
-                {/* DATI UTENTE */}
-                <div style={{ textAlign: "left", display: "inline-block", marginTop: 10 }}>
-
-                    <div style={{ marginBottom: 12 }}>
-                        <strong style={{ color: "#2ed573" }}>SPORT PREFERITO: </strong>
-                        <span style={{ color: "#fda085" }}>{profile?.sportPreference || "Non specificato"}</span>
+                {/* Griglia Statistiche */}
+                <div className="stats-grid">
+                    <div className="stat-box">
+                        <span className="stat-label">Sport Preferito</span>
+                        <div className="stat-value" style={{color: "var(--primary)"}}>
+                            {profile?.sportPreference || "Misto"}
+                        </div>
                     </div>
 
-                    {/* --- QUI AGGIUNGIAMO L'ETÀ --- */}
-                    <div style={{ marginBottom: 12 }}>
-                        <strong style={{ color: "#2ed573" }}>ETÀ: </strong>
-                        <span style={{ color: "#fff" }}>{profile?.age ? profile.age + " anni" : "Non specificata"}</span>
+                    <div className="stat-box">
+                        <span className="stat-label">Età</span>
+                        <div className="stat-value">
+                            {profile?.age ? profile.age + " anni" : "--"}
+                        </div>
                     </div>
 
-                    <div style={{ marginBottom: 12 }}>
-                        <strong style={{ color: "#2ed573" }}>STREAK: </strong>
-                        <span style={{ color: "#fff", fontWeight: "bold" }}>0 Giorni</span>
+                    <div className="stat-box">
+                        <span className="stat-label">Streak</span>
+                        <div className="stat-value">🔥 3 Giorni</div>
+                    </div>
+
+                    <div className="stat-box">
+                        <span className="stat-label">Livello</span>
+                        <div className="stat-value">Rookie 1</div>
                     </div>
                 </div>
 
-                {/* BADGE */}
-                <div style={{ marginTop: 30 }}>
-                    <div style={{ marginBottom: 18, fontWeight: 600, color: "#fda085" }}>
-                        BADGE SBLOCCATI:
-                    </div>
-                    <div
-                        style={{
-                            display: "flex",
-                            gap: 14,
-                            justifyContent: "center",
-                        }}
-                    >
-                        <span className="badge-icon" style={{ background: "#2ed573", padding: 10, borderRadius: "50%" }}>🏆</span>
-                        <span className="badge-icon" style={{ background: "#fda085", padding: 10, borderRadius: "50%" }}>🔥</span>
+                {/* Sezione Badge (Aggiornata con classe badge-circle) */}
+                <div className="badges-section">
+                    <h4>BADGE SBLOCCATI</h4>
+
+                    <div style={{ display: "flex", gap: "15px", justifyContent: "center", flexWrap: "wrap" }}>
+
+                        {/* Badge 1: Campione */}
+                        <div
+                            className="badge-circle"
+                            style={{ background: "rgba(46, 213, 115, 0.2)", color: "var(--primary)" }}
+                            title="Campione"
+                        >
+                            <FaMedal />
+                        </div>
+
+                        {/* Badge 2: On Fire */}
+                        <div
+                            className="badge-circle"
+                            style={{ background: "rgba(255, 165, 2, 0.2)", color: "var(--accent)" }}
+                            title="Streak attiva"
+                        >
+                            <FaFire />
+                        </div>
+
+                        {/* Badge Vuoto/Bloccato */}
+                        <div
+                            className="badge-circle"
+                            style={{ background: "#333", color: "#555", cursor: "default" }}
+                            title="Da sbloccare"
+                        >
+                            ?
+                        </div>
+
                     </div>
                 </div>
             </div>

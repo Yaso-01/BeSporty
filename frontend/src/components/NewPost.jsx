@@ -1,32 +1,59 @@
 import React, { useMemo, useState } from "react";
 import { ApiService } from "../services/ApiService";
-import { FaCamera } from "react-icons/fa";
+import {
+    FaCamera,
+    FaRunning,
+    FaDumbbell,
+    FaSwimmer,
+    FaBiking,
+    FaFutbol,
+    FaBasketballBall,
+    FaWalking,
+    FaHiking
+} from "react-icons/fa";
+import { IoIosTennisball } from "react-icons/io";
+
+// 1. CONFIGURAZIONE: Lista degli sport con Icone e Etichette
+const SPORTS_OPTIONS = [
+    { id: "Running", label: "Corsa", icon: <FaRunning /> },
+    { id: "Gym", label: "Palestra", icon: <FaDumbbell /> },
+    { id: "Cycling", label: "Ciclismo", icon: <FaBiking /> },
+    { id: "Swimming", label: "Nuoto", icon: <FaSwimmer /> },
+    { id: "Soccer", label: "Calcio", icon: <FaFutbol /> },
+    { id: "Basketball", label: "Basket", icon: <FaBasketballBall /> },
+    { id: "Tennis", label: "Tennis", icon: <IoIosTennisball /> },
+    { id: "Walking", label: "Camminata", icon: <FaWalking /> },
+    { id: "Hiking", label: "Trekking", icon: <FaHiking /> },
+];
 
 export default function NewPost({ user, onPostCreated }) {
-    // Se non passa da props, prova a leggerlo da localStorage
     const storedUser = useMemo(() => {
         try {
-            const raw = localStorage.getItem("besporty:user");
+            const raw = localStorage.getItem("user");
             return raw ? JSON.parse(raw) : null;
-        } catch {
-            return null;
-        }
+        } catch { return null; }
     }, []);
     const effectiveUser = user || storedUser;
 
     const [form, setForm] = useState({
         text: "",
         imageUrl: "",
-        sport: effectiveUser?.sportPreference || "",
+        sport: effectiveUser?.sportPreference || "Running", // Default sicuro
         feeling: "",
-        intensity: 0,
+        intensity: "5", // Default intermedio
         visibility: "PUBLIC",
     });
+
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
     const handleChange = (e) =>
         setForm({ ...form, [e.target.name]: e.target.value });
+
+    // Funzione specifica per selezionare lo sport dalla griglia
+    const selectSport = (sportId) => {
+        setForm({ ...form, sport: sportId });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -42,94 +69,109 @@ export default function NewPost({ user, onPostCreated }) {
             setForm({
                 text: "",
                 imageUrl: "",
-                sport: effectiveUser?.sportPreference || "",
+                sport: effectiveUser?.sportPreference || "Running",
                 feeling: "",
-                intensity: 0,
+                intensity: "5",
                 visibility: "PUBLIC",
             });
             setSuccess("Check-in condiviso con successo!");
-            onPostCreated?.();
+            if (onPostCreated) onPostCreated();
+            setTimeout(() => setSuccess(""), 3000);
         } catch (err) {
             setError(err.message || "Impossibile creare post.");
         }
     };
 
     return (
-        <div className="newpost-container" style={{ marginTop: "20px" }}>
-            <h3 style={{ color: "#2ed573" }}>
-                <FaCamera style={{ marginRight: "8px" }} />
-                Nuovo allenamento
-            </h3>
+        <div className="newpost-card">
+            <div className="newpost-header">
+                <FaCamera style={{ fontSize: "1.2rem" }} />
+                <span>Nuova Attività</span>
+            </div>
 
             <form onSubmit={handleSubmit}>
-        <textarea
-            name="text"
-            placeholder="Come è andato l'allenamento?"
-            value={form.text}
-            onChange={handleChange}
-            required
-        />
+                {/* 2. SELETTORE SPORT VISUALE (Griglia) */}
+                <label className="section-label">Scegli lo sport:</label>
+                <div className="sports-grid">
+                    {SPORTS_OPTIONS.map((option) => (
+                        <div
+                            key={option.id}
+                            className={`sport-card ${form.sport === option.id ? "selected" : ""}`}
+                            onClick={() => selectSport(option.id)}
+                        >
+                            <div className="sport-icon">{option.icon}</div>
+                            <span className="sport-label">{option.label}</span>
+                        </div>
+                    ))}
+                </div>
 
-                <input
-                    name="imageUrl"
-                    placeholder="URL foto/video (facoltativo)"
-                    value={form.imageUrl}
-                    onChange={handleChange}
-                />
-
-                <input
-                    name="sport"
-                    placeholder="Sport praticato"
-                    value={form.sport}
+                {/* Descrizione */}
+                <textarea
+                    name="text"
+                    rows="3"
+                    placeholder="Racconta la tua performance..."
+                    value={form.text}
                     onChange={handleChange}
                     required
+                    style={{ marginTop: "15px" }}
                 />
+
+                <div className="form-row">
+                    {/* 3. INTENSITÀ (Select Dropdown) */}
+                    <div style={{ flex: 1 }}>
+                        <label className="input-label">Intensità</label>
+                        <select
+                            name="intensity"
+                            value={form.intensity}
+                            onChange={handleChange}
+                            className="styled-select"
+                        >
+                            <option value="1">1 - Riposo attivo</option>
+                            <option value="3">3 - Leggero</option>
+                            <option value="5">5 - Moderato</option>
+                            <option value="7">7 - Impegnativo</option>
+                            <option value="9">9 - Estremo</option>
+                            <option value="10">10 - Massimale</option>
+                        </select>
+                    </div>
+
+                    <div style={{ flex: 1 }}>
+                        <label className="input-label">Visibilità</label>
+                        <select
+                            name="visibility"
+                            value={form.visibility}
+                            onChange={handleChange}
+                            className="styled-select"
+                        >
+                            <option value="PUBLIC">🌎 Pubblico</option>
+                            <option value="FRIENDS">👥 Amici</option>
+                            <option value="PRIVATE">🔒 Privato</option>
+                        </select>
+                    </div>
+                </div>
 
                 <input
                     name="feeling"
-                    placeholder="Sensazione (es: motivato, stanco...)"
+                    placeholder="Sensazione (es. Carico a mille! 🔥)"
                     value={form.feeling}
                     onChange={handleChange}
                 />
 
                 <input
-                    name="intensity"
-                    type="number"
-                    min="1"
-                    max="10"
-                    placeholder="Intensità (1-10)"
-                    value={form.intensity}
+                    name="imageUrl"
+                    placeholder="URL Foto (opzionale)"
+                    value={form.imageUrl}
                     onChange={handleChange}
                 />
 
-                <select
-                    name="visibility"
-                    value={form.visibility}
-                    onChange={handleChange}
-                >
-                    <option value="PUBLIC">Pubblico</option>
-                    <option value="FRIENDS">Solo amici</option>
-                    <option value="PRIVATE">Privato</option>
-                </select>
+                {error && <div className="msg-error">⚠️ {error}</div>}
+                {success && <div className="msg-success">✅ {success}</div>}
 
-                {error && <div className="error" style={{ color: "red", marginTop: 10 }}>{error}</div>}
-                {success && <div className="success" style={{ color: "limegreen", marginTop: 10 }}>{success}</div>}
-
-                <button
-                    type="submit"
-                    className="btn-accent"
-                    style={{
-                        marginTop: 15,
-                        background: "#2ed573",
-                        color: "#fff",
-                        padding: "10px 16px",
-                        border: "none",
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                    }}
-                >
-                    Condividi
-                </button>
+                <div style={{ textAlign: "right", marginTop: "15px" }}>
+                    <button type="submit" className="btn-primary">
+                        PUBBLICA
+                    </button>
+                </div>
             </form>
         </div>
     );

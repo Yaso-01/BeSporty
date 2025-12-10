@@ -43,6 +43,8 @@ public class CheckInService {
 
         if (feeling != null && !feeling.isBlank()) c.setFeeling(feeling.trim());
         if (intensity != null) c.setIntensity(Math.max(1, Math.min(10, intensity)));
+        //controlla che l'intensità sia tra 1 e 10 (Math.max(1, Math.min(10, intensity)))
+        // e forza la visibilità a "PUBLIC" se arriva un valore strano.
         if (visibility != null && !visibility.isBlank()) {
             // Accetta solo valori attesi, altrimenti default PUBLIC
             String v = visibility.trim().toUpperCase();
