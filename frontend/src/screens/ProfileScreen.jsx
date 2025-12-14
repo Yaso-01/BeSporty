@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { ApiService } from "../services/ApiService";
-import { FaMedal, FaFire, FaUserAstronaut } from "react-icons/fa"; // Ho aggiunto un'icona carina per il placeholder
+import { FaRunning, FaBolt, FaUserAstronaut } from "react-icons/fa"; // Icone coerenti con BadgeScreen
 
 export default function ProfileScreen({ user }) {
-    // 1. Recupero utente da props o localStorage
     const storedUser = useMemo(() => {
         try {
             const raw = localStorage.getItem("user");
@@ -17,13 +16,11 @@ export default function ProfileScreen({ user }) {
     const [profile, setProfile] = useState(effectiveUser);
     const [error, setError] = useState("");
 
-    // 2. Caricamento dati aggiornati dal Backend
     useEffect(() => {
         const load = async () => {
             if (!effectiveUser?.id) return;
             try {
                 const p = await ApiService.getProfile(effectiveUser.id);
-                // Uniamo i dati locali con quelli freschi del server
                 setProfile({ ...effectiveUser, ...p });
             } catch (e) {
                 console.error(e);
@@ -33,7 +30,6 @@ export default function ProfileScreen({ user }) {
         load();
     }, [effectiveUser]);
 
-    // Se l'utente non è loggato
     if (!effectiveUser) {
         return (
             <div className="page-container" style={{ textAlign: "center", marginTop: "50px" }}>
@@ -89,35 +85,35 @@ export default function ProfileScreen({ user }) {
                     </div>
                 </div>
 
-                {/* Sezione Badge (Aggiornata con classe badge-circle) */}
+                {/* Sezione Badge Sincronizzata */}
                 <div className="badges-section">
-                    <h4>BADGE SBLOCCATI</h4>
+                    <h4>ULTIMI BADGE SBLOCCATI</h4>
 
                     <div style={{ display: "flex", gap: "15px", justifyContent: "center", flexWrap: "wrap" }}>
 
-                        {/* Badge 1: Campione */}
+                        {/* Badge 1: Primo Passo (Coerente con BadgeScreen) */}
                         <div
                             className="badge-circle"
-                            style={{ background: "rgba(46, 213, 115, 0.2)", color: "var(--primary)" }}
-                            title="Campione"
+                            style={{ background: "rgba(46, 213, 115, 0.1)", color: "var(--primary)", border: "2px solid var(--primary)" }}
+                            title="Primo Passo: Primo Check-In effettuato"
                         >
-                            <FaMedal />
+                            <FaRunning />
                         </div>
 
-                        {/* Badge 2: On Fire */}
+                        {/* Badge 2: Costanza (Coerente con BadgeScreen) */}
                         <div
                             className="badge-circle"
-                            style={{ background: "rgba(255, 165, 2, 0.2)", color: "var(--accent)" }}
-                            title="Streak attiva"
+                            style={{ background: "rgba(255, 165, 2, 0.1)", color: "var(--accent)", border: "2px solid var(--accent)" }}
+                            title="Costanza: 3 Giorni di fila"
                         >
-                            <FaFire />
+                            <FaBolt />
                         </div>
 
-                        {/* Badge Vuoto/Bloccato */}
+                        {/* Placeholder Vuoto */}
                         <div
                             className="badge-circle"
-                            style={{ background: "#333", color: "#555", cursor: "default" }}
-                            title="Da sbloccare"
+                            style={{ background: "#2a2a2a", color: "#555", cursor: "default", border: "2px solid #444" }}
+                            title="Slot Vuoto"
                         >
                             ?
                         </div>

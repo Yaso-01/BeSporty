@@ -1,49 +1,88 @@
-import React from "react";
-import { FaTrophy, FaBolt, FaMedal } from "react-icons/fa";
+import React, { useMemo } from "react";
+import { FaTrophy, FaBolt, FaMedal, FaRunning, FaMountain, FaLock, FaSwimmer, FaDumbbell } from "react-icons/fa";
 
-export default function BadgeScreen() {
-    // Qui visualizzerai tutti i badge sbloccabili, motivazione, statistiche...
+export default function BadgeScreen({ user }) {
+    const storedUser = useMemo(() => {
+        try { return JSON.parse(localStorage.getItem("user")); } catch { return null; }
+    }, []);
+    const effectiveUser = user || storedUser;
+
+    // SIMULAZIONE DATI DAL BACKEND
+    // In futuro questi dati arriveranno da ApiService.getBadges(userId)
+    const badges = [
+        { id: 1, name: "Primo Passo", desc: "Effettua il tuo primo Check-In", icon: <FaRunning />, unlocked: true },
+        { id: 2, name: "Costanza", desc: "Streak di 3 giorni consecutivi", icon: <FaBolt />, unlocked: true },
+        { id: 3, name: "Veterano", desc: "Iscritto alla piattaforma da 1 mese", icon: <FaMedal />, unlocked: false },
+        { id: 4, name: "Scalatore", desc: "Registra un'attività di Trekking", icon: <FaMountain />, unlocked: false },
+        { id: 5, name: "Delfino", desc: "Completa 10 sessioni di Nuoto", icon: <FaSwimmer />, unlocked: false },
+        { id: 6, name: "Bodybuilder", desc: "5 Check-in in Palestra con intensità 10", icon: <FaDumbbell />, unlocked: false },
+        { id: 7, name: "Campione", desc: "Vinci una sfida di gruppo", icon: <FaTrophy />, unlocked: false },
+    ];
+
+    // Calcolo statistiche
+    const unlockedCount = badges.filter(b => b.unlocked).length;
+    const totalBadges = badges.length;
+    const progressPercentage = (unlockedCount / totalBadges) * 100;
+
     return (
-        <div style={{ padding: "24px", background: "#181818", minHeight: "100vh" }}>
-            <div style={{
-                background: "#222",
-                color: "#fff",
-                padding: "30px 18px",
-                borderRadius: "22px",
-                margin: "0 auto",
-                maxWidth: "500px",
-                boxShadow: "0 2px 18px #2ed57333"
-            }}>
-                <h2 style={{
-                    color: "#2ed573",
-                    marginBottom: 10,
-                    fontWeight: 700,
-                    letterSpacing: 2,
-                    display: "flex", alignItems: "center", gap: 10
-                }}><FaTrophy /> Badge & Statistiche</h2>
-                <p style={{ color: "#fda085", marginBottom: 24 }}>
-                    Completa check-in e challenge per ottenere badge esclusivi e monitora i tuoi progressi!
-                </p>
-                <div style={{
-                    display: "flex", gap: 18, flexWrap: "wrap", justifyContent: "center"
-                }}>
-                    {/* Badge visivi placeholder */}
-                    <div style={{
-                        background: "#2ed573", color: "#000", borderRadius: "50%", width: 56, height: 56, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30
-                    }}>
-                        <FaTrophy />
-                    </div>
-                    <div style={{
-                        background: "#fda085", color: "#000", borderRadius: "50%", width: 56, height: 56, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30
-                    }}>
-                        <FaBolt />
-                    </div>
-                    <div style={{
-                        background: "#fff", color: "#2ed573", borderRadius: "50%", width: 56, height: 56, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30
-                    }}>
-                        <FaMedal />
-                    </div>
+        <div className="page-container">
+            <h2 className="page-title">
+                <FaTrophy style={{ marginRight: 10, fontSize: "1.5rem" }} />
+                BACHECA TROFEI
+            </h2>
+
+            {/* CARD RIEPILOGO E PROGRESSO */}
+            <div className="profile-card" style={{ padding: "30px", marginBottom: "40px" }}>
+                <h3 style={{ color: "var(--primary)", marginTop: 0 }}>
+                    Livello Collezionista
+                </h3>
+
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px", color: "var(--text-muted)", fontSize: "0.9rem" }}>
+                    <span>Progressi sblocco</span>
+                    <span>{unlockedCount} / {totalBadges}</span>
                 </div>
+
+                {/* Barra di Progresso */}
+                <div style={{ width: "100%", height: "12px", background: "#333", borderRadius: "6px", overflow: "hidden" }}>
+                    <div
+                        style={{
+                            width: `${progressPercentage}%`,
+                            height: "100%",
+                            background: "linear-gradient(90deg, var(--primary), var(--accent))",
+                            transition: "width 0.8s ease-in-out"
+                        }}
+                    />
+                </div>
+
+                <p style={{ marginTop: "20px", color: "#eee" }}>
+                    Completa le sfide e mantieni alta la streak per sbloccare nuovi badge esclusivi!
+                </p>
+            </div>
+
+            {/* GRIGLIA DEI BADGE */}
+            <h3 style={{ color: "var(--text-main)", textAlign: "center", fontFamily: "Azonix, sans-serif", marginBottom: "20px" }}>
+                TUTTI I BADGE
+            </h3>
+
+            <div className="badge-grid">
+                {badges.map((badge) => (
+                    <div key={badge.id} className={`badge-item ${badge.unlocked ? "unlocked" : "locked"}`}>
+
+                        {/* Cerchio Icona */}
+                        <div className="badge-circle-large">
+                            {badge.unlocked ? badge.icon : <FaLock />}
+                        </div>
+
+                        {/* Testi */}
+                        <div className="badge-name">{badge.name}</div>
+                        <div className="badge-desc">{badge.desc}</div>
+
+                        {/* Etichetta Stato */}
+                        <div className="badge-status">
+                            {badge.unlocked ? "SBLOCCATO" : "BLOCCATO"}
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     );

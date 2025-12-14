@@ -1,88 +1,75 @@
-import React, { useState } from 'react';
-import { ApiService } from '../services/ApiService';
-import { useNavigate, Link } from 'react-router-dom';
-import { FaUser, FaLock } from 'react-icons/fa'; // Icone
-import './Auth.css'; // Importa il nuovo CSS
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ApiService } from "../services/ApiService";
+import { FaRunning } from "react-icons/fa";
 
-const Login = ({ onLogin }) => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+export default function Login({ onLogin }) {
     const navigate = useNavigate();
+    const [formData, setFormData] = useState({ usernameOrEmail: "", password: "" });
+    const [error, setError] = useState("");
 
-    const handleLogin = async (e) => {
+    const handleChange = (e) =>
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
         try {
-            // Nota: ApiService.login si aspetta (email, password)
-            // Assicurati che il backend accetti "usernameOrEmail" se usi l'email
-            const response = await ApiService.login(email, password);
-            onLogin(response);
-            navigate('/feed');
+            const user = await ApiService.login(formData.usernameOrEmail, formData.password);
+            onLogin(user);
+            navigate("/feed");
         } catch (err) {
-            console.error(err);
-            setError('Credenziali non valide. Riprova.');
+            setError(err.message);
         }
     };
 
     return (
         <div className="auth-container">
-            <div className="auth-box">
-                {/* Icona omino in alto */}
-                <div className="auth-icon-top">
-                    <FaUser />
+            <div className="auth-card">
+                {/* Logo / Brand */}
+                <div className="auth-header">
+                    <div className="auth-icon-circle">
+                        <FaRunning />
+                    </div>
+                    <h1 className="auth-title">BESPORTY</h1>
+                    <p className="auth-subtitle">Entra nel gioco. Supera i limiti.</p>
                 </div>
 
-                <h2 className="auth-title">User Login</h2>
+                {error && <div className="msg-error" style={{textAlign: 'center', marginBottom: 15}}>{error}</div>}
 
-                <form onSubmit={handleLogin}>
-                    {/* Campo Email */}
-                    <div className="input-wrapper">
-                        <FaUser className="input-icon" />
+                <form onSubmit={handleSubmit}>
+                    <div className="input-group">
+                        <label className="input-label">Email o Username</label>
                         <input
-                            type="text" // Uso text per permettere username o email
-                            className="auth-input"
-                            placeholder="Email o Username"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            name="usernameOrEmail"
+                            type="text"
+                            placeholder="Inserisci le tue credenziali"
+                            value={formData.usernameOrEmail}
+                            onChange={handleChange}
                             required
                         />
                     </div>
 
-                    {/* Campo Password */}
-                    <div className="input-wrapper">
-                        <FaLock className="input-icon" />
+                    <div className="input-group">
+                        <label className="input-label">Password</label>
                         <input
+                            name="password"
                             type="password"
-                            className="auth-input"
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="••••••••"
+                            value={formData.password}
+                            onChange={handleChange}
                             required
                         />
                     </div>
 
-                    {error && <div className="error-msg">{error}</div>}
-
-                    <div className="auth-options">
-                        <label>
-                            <input type="checkbox" style={{ marginRight: 5 }} />
-                            Ricordami
-                        </label>
-                        <span>Password dimenticata?</span>
-                    </div>
-
-                    <button type="submit" className="auth-button" style={{background: "#3b5998"}}>
-                        LOGIN
+                    <button type="submit" className="btn-primary" style={{ width: "100%", marginTop: "10px" }}>
+                        ACCEDI ORA
                     </button>
-
-                    <div style={{ marginTop: 20, fontSize: '0.9rem', color: '#888' }}>
-                        Non hai un account? <Link to="/register">Registrati</Link>
-                    </div>
                 </form>
+
+                <div className="auth-footer">
+                    Non hai ancora un account? <Link to="/register" className="auth-link">Registrati qui</Link>
+                </div>
             </div>
         </div>
     );
-};
-
-export default Login;
+}

@@ -1,17 +1,16 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FaBars, FaTimes } from "react-icons/fa"; // Assicurati di avere react-icons installato
+import { FaBars, FaTimes } from "react-icons/fa";
 import "./Navbar.css";
 
 export default function Navbar({ onLogout }) {
     const location = useLocation();
-    const [isOpen, setIsOpen] = useState(false); // Stato per gestire apertura/chiusura
+    const [isOpen, setIsOpen] = useState(false);
 
     // Helper per classe attiva
     const getLinkClass = (path) =>
         location.pathname === path ? "nav-link active" : "nav-link";
 
-    // Funzione per chiudere il menu quando si clicca un link
     const closeMenu = () => setIsOpen(false);
 
     return (
@@ -21,12 +20,17 @@ export default function Navbar({ onLogout }) {
                     BESPORTY
                 </Link>
 
-                {/* Icona Hamburger (visibile solo su mobile) */}
-                <div className="menu-icon" onClick={() => setIsOpen(!isOpen)}>
+                <div
+                    className="menu-icon"
+                    onClick={() => setIsOpen(!isOpen)}
+                    style={{
+                        transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
+                        transition: "transform 0.3s ease"
+                    }}
+                >
                     {isOpen ? <FaTimes /> : <FaBars />}
                 </div>
 
-                {/* Lista Link (Aggiungiamo classe 'active' se aperto) */}
                 <div className={`navbar-links ${isOpen ? "active" : ""}`}>
                     <Link to="/feed" className={getLinkClass("/feed")} onClick={closeMenu}>
                         Feed
@@ -37,11 +41,16 @@ export default function Navbar({ onLogout }) {
                     <Link to="/groups" className={getLinkClass("/groups")} onClick={closeMenu}>
                         Gruppi
                     </Link>
+
+                    {/* --- NUOVO LINK BADGE --- */}
+                    <Link to="/badges" className={getLinkClass("/badges")} onClick={closeMenu}>
+                        Badge
+                    </Link>
+
                     <Link to="/profile" className={getLinkClass("/profile")} onClick={closeMenu}>
                         Profilo
                     </Link>
 
-                    {/* Bottone Logout */}
                     <button
                         onClick={() => { onLogout(); closeMenu(); }}
                         className="btn-logout"
@@ -53,3 +62,4 @@ export default function Navbar({ onLogout }) {
         </nav>
     );
 }
+
